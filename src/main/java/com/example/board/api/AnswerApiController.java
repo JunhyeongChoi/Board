@@ -4,18 +4,12 @@ import com.example.board.form.AnswerForm;
 import com.example.board.model.Answer;
 import com.example.board.model.Board;
 import com.example.board.repository.AnswerRepository;
-import com.example.board.repository.BoardRepository;
 import com.example.board.service.AnswerService;
 import com.example.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.util.List;
 
 @RequestMapping("/api")
