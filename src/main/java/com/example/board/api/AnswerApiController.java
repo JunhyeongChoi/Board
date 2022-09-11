@@ -3,6 +3,7 @@ package com.example.board.api;
 import com.example.board.form.AnswerForm;
 import com.example.board.model.Answer;
 import com.example.board.model.Board;
+import com.example.board.model.Comment;
 import com.example.board.repository.AnswerRepository;
 import com.example.board.service.AnswerService;
 import com.example.board.service.BoardService;
@@ -10,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -60,8 +64,14 @@ public class AnswerApiController {
 
     // 댓글 삭제 API
     @DeleteMapping("/answers/{id}")
-    void deleteAnswer(@PathVariable Long id) {
-        answerRepository.deleteById(id);
+    public void deleteComment(@PathVariable("id") Long id) {
+        Optional<Answer> answer = Optional.ofNullable(this.answerService.getAnswer(id));
+        if (answer.isPresent()) {
+            Answer c = answer.get();
+            this.answerService.delete(c);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "entity not found");
+        }
     }
 
 }
