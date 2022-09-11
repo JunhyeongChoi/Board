@@ -1,6 +1,5 @@
 package com.example.board.api;
 
-import com.example.board.model.User;
 import com.example.board.repository.BoardRepository;
 import com.example.board.model.Board;
 import com.example.board.service.BoardService;
@@ -12,7 +11,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +24,7 @@ class BoardApiController {
     @Autowired
     private BoardService boardService;
 
-    // 페이징, 검색(제목, 내용에 포함) API
+    // 페이징, 검색(제목, 내용에 포함) 조회 API
     @GetMapping("/boards")
     public Page<Board> list(@PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
                             @RequestParam(required = false, defaultValue = "") String searchText) {
@@ -44,13 +42,13 @@ class BoardApiController {
         if (file == null) {
             repository.save(newBoard);
         } else {
-            boardService.save(newBoard, file);
+            boardService.write(newBoard, file);
         }
 
         return repository.findById(newBoard.getId()).orElse(null);
     }
 
-    // id 검색 API
+    // id로 글 조회 API
     @GetMapping("/boards/{id}")
     Board one(@PathVariable Long id) {
 
@@ -74,7 +72,7 @@ class BoardApiController {
                 });
     }
 
-    @Secured("ROLE_ADMIN")
+    // 글 삭제 API
     @DeleteMapping("/boards/{id}")
     void deleteBoard(@PathVariable Long id) {
         repository.deleteById(id);

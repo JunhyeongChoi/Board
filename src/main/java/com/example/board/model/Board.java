@@ -7,6 +7,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
 
 @Entity
 @Data
@@ -30,10 +34,13 @@ public class Board {
 
     private String filepath;
 
-    @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Answer> answerList;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "board")
+    private List<Comment> commentList;
 
 }
 

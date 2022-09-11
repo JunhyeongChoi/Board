@@ -56,7 +56,7 @@ public class BoardController {
     }
 
     @PostMapping("/form")
-    public String postForm(@Valid Board board, BindingResult bindingResult, MultipartFile file, Authentication authentication) throws Exception {
+    public String postForm(@Valid Board board, BindingResult bindingResult, MultipartFile file) throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
         board.setDate(now);
@@ -66,8 +66,8 @@ public class BoardController {
             return "board/form";
         }
 
-        String username = authentication.getName();
-        boardService.write(username, board, file);
+//        String username = authentication.getName();
+        boardService.write(board, file);
 
 //       reidrect를 안쓰면 게시물 전체 조회 갱신이 안됨
         return "redirect:/board/list";
