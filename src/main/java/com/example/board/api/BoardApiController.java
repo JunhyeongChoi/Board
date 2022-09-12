@@ -63,7 +63,7 @@ class BoardApiController {
                 .map(board -> {
                     board.setTitle(newBoard.getTitle());
                     board.setContent(newBoard.getContent());
-                    board.setLost(newBoard.getLost());
+                    board.setIsLost(newBoard.getIsLost());
                     return repository.save(board);
                 })
                 .orElseGet(() -> {

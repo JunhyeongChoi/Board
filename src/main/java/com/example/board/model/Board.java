@@ -28,7 +28,7 @@ public class Board {
     @Column
     private LocalDateTime date;
 
-    private String lost;   // 분실, 발견
+    private Boolean isLost;   // 분실, 발견
 
     private String filename;
 
