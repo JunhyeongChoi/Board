@@ -1,9 +1,11 @@
 package com.example.board.api;
 
 import com.example.board.form.UserCreateForm;
+import com.example.board.model.Answer;
 import com.example.board.model.SiteUser;
 import com.example.board.repository.UserRepository;
 import com.example.board.service.UserService;
+import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -11,21 +13,33 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@Slf4j
+@RequestMapping("/api")
 public class UserApiController {
 
     private final UserService userService;
     private final UserRepository userRepository;
 
-    @GetMapping("/signup")
-    public String signup(UserCreateForm userCreateForm) {
-        return "signup_form";
+    // 전체 유저 조회 API
+    @GetMapping("/user")
+    public List<SiteUser> all() {
+
+        return userRepository.findAll();
     }
 
-    @PostMapping("/signup")
+    // id로 유저 한 명 조회 API
+    @GetMapping("/user/{id}")
+    public SiteUser one(@PathVariable Long id) {
+
+        return userRepository.findById(id).orElse(null);
+    }
+
+    // 회원가입 API
+    @PostMapping("/user/signup")
     public ResponseEntity signup(@RequestBody UserCreateForm userCreateForm, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             //return "signup_form";
@@ -56,8 +70,8 @@ public class UserApiController {
         return ResponseEntity.ok(siteUser);
     }
 
-
-    @PostMapping("/login")
+    // 로그인 API
+    @PostMapping("/user/login")
     public ResponseEntity login() {
 
         return ResponseEntity.ok(1);
