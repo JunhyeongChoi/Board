@@ -1,14 +1,18 @@
 package com.example.board.api;
 
+import com.example.board.form.LoginForm;
 import com.example.board.form.UserCreateForm;
 import com.example.board.model.Answer;
 import com.example.board.model.SiteUser;
 import com.example.board.repository.UserRepository;
+import com.example.board.service.UserSecurityService;
 import com.example.board.service.UserService;
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +27,7 @@ public class UserApiController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final UserSecurityService userSecurityService;
 
     // 전체 유저 조회 API
     @GetMapping("/user")
@@ -40,7 +45,7 @@ public class UserApiController {
 
     // 회원가입 API
     @PostMapping("/user/signup")
-    public ResponseEntity signup(@RequestBody UserCreateForm userCreateForm, BindingResult bindingResult) {
+    public ResponseEntity signup(@RequestBody @Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             //return "signup_form";
             return ResponseEntity.notFound().build(); // -> 404에러를 반환
@@ -72,8 +77,8 @@ public class UserApiController {
 
     // 로그인 API
     @PostMapping("/user/login")
-    public ResponseEntity login() {
-
-        return ResponseEntity.ok(1);
+    public ResponseEntity<UserDetails> login(@RequestBody LoginForm loginForm){
+        UserDetails login = this.userSecurityService.loadUserByUsername(loginForm.getUsername());
+        return ResponseEntity.status(HttpStatus.OK).body(login);
     }
 }
