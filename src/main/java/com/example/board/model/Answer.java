@@ -2,6 +2,7 @@ package com.example.board.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -29,4 +30,8 @@ public class Answer {
     @JsonIgnore
     @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
     private List<Comment> commentList;
+
+    @ManyToOne
+    private SiteUser author;
+
 }

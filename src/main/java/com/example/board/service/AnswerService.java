@@ -4,6 +4,7 @@ import com.example.board.DataNotFoundException;
 import com.example.board.form.AnswerForm;
 import com.example.board.model.Answer;
 import com.example.board.model.Board;
+import com.example.board.model.SiteUser;
 import com.example.board.repository.AnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,11 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
 
-    public Answer create(Board board, AnswerForm answerForm) {
+    public Answer create(Board board, String content, SiteUser author) {
         Answer answer = new Answer();
-        answer.setContent(answerForm.getContent());
+        answer.setContent(content);
         answer.setDate(LocalDateTime.now());
+        answer.setAuthor(author);
         answer.setBoard(board);
 
         answerRepository.save(answer);
