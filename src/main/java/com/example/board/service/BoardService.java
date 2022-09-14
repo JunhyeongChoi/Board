@@ -17,6 +17,7 @@ public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
 
+    // 글 등록
     public void write(Board board, MultipartFile file) throws Exception {
 
         if (!file.getOriginalFilename().isEmpty()) {
@@ -38,6 +39,24 @@ public class BoardService {
 
         boardRepository.save(board);
 
+    }
+
+    // 파일 삭제
+    public void deleteFile(Board board) {
+
+        // 파일의 경로 + 파일명
+        String filePath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files\\" + board.getFilename();
+        File deleteFile = new File(filePath);
+
+        // 파일이 존재하는지 체크 존재할경우 true, 존재하지않을경우 false
+        if(deleteFile.exists()) {
+
+            // 파일을 삭제합니다.
+            deleteFile.delete();
+        }
+
+        board.setFilename(null);
+        board.setFilepath(null);
     }
 
     public Board getBoard(Long id) {

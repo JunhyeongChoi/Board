@@ -31,7 +31,4 @@ public class Answer {
     @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
     private List<Comment> commentList;
 
-    @ManyToOne
-    private SiteUser author;
-
 }

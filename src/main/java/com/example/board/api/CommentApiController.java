@@ -2,22 +2,16 @@ package com.example.board.api;
 
 import com.example.board.form.CommentForm;
 import com.example.board.model.Answer;
-import com.example.board.model.Board;
 import com.example.board.model.Comment;
 import com.example.board.repository.CommentRepository;
 import com.example.board.service.AnswerService;
-import com.example.board.service.BoardService;
 import com.example.board.service.CommentService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 

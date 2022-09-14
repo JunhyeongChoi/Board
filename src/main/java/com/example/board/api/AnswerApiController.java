@@ -3,16 +3,12 @@ package com.example.board.api;
 import com.example.board.form.AnswerForm;
 import com.example.board.model.Answer;
 import com.example.board.model.Board;
-import com.example.board.model.Comment;
-import com.example.board.model.SiteUser;
 import com.example.board.repository.AnswerRepository;
 import com.example.board.service.AnswerService;
 import com.example.board.service.BoardService;
-import com.example.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,7 +25,6 @@ public class AnswerApiController {
     private final BoardService boardService;
     private final AnswerRepository answerRepository;
     private final AnswerService answerService;
-    private final UserService userService;
 
     // 전체 댓글 조회 API
     @GetMapping("/answers")
@@ -46,17 +41,15 @@ public class AnswerApiController {
     }
 
     // 댓글 등록 API
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/answers/{id}")
-    public ResponseEntity<Answer> answerCreate(@PathVariable Long id, @RequestBody AnswerForm answerForm, BindingResult bindingResult, Principal principal){
+    public ResponseEntity<Answer> answerCreate(@PathVariable Long id, @RequestBody AnswerForm answerForm, BindingResult bindingResult){
 
         Board board = this.boardService.getBoard(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
         if (bindingResult.hasErrors()) {
 //            return "question_detail";
         }
 
-        Answer answer = this.answerService.create(board, answerForm.getContent(), siteUser);
+        Answer answer = this.answerService.create(board, answerForm);
 
         return (answer != null) ? ResponseEntity.status(HttpStatus.OK).body(answer) : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }

@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -57,14 +56,27 @@ class BoardApiController {
 
     // 글 수정 API
     @PutMapping("/boards/{id}")
-    Board replaceBoard(@RequestBody Board newBoard, @PathVariable Long id, MultipartFile file) {
+    Board replaceBoard(Board newBoard, @PathVariable Long id, MultipartFile file) {
 
         return repository.findById(id)
                 .map(board -> {
                     board.setTitle(newBoard.getTitle());
                     board.setContent(newBoard.getContent());
                     board.setIsLost(newBoard.getIsLost());
-                    return repository.save(board);
+
+                    if (file == null) {
+                        boardService.deleteFile(board);
+                        return repository.save(board);
+                    } else {
+                        try {
+                            boardService.write(board, file);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    Board resultBoard = repository.findById(board.getId()).orElse(null);
+                    return resultBoard;
                 })
                 .orElseGet(() -> {
                     newBoard.setId(id);
@@ -72,9 +84,23 @@ class BoardApiController {
                 });
     }
 
+//    // 파일 삭제 API
+//    @DeleteMapping("/boards/files/{id}")
+//    void deleteFile(@PathVariable Long id) {
+//
+//        Board board = repository.findById(id).orElse(null);
+//
+//        boardService.deleteFile(board);
+//        repository.save(board);
+//    }
+
     // 글 삭제 API
     @DeleteMapping("/boards/{id}")
     void deleteBoard(@PathVariable Long id) {
+
+        Board board = repository.findById(id).orElse(null);
+
+        boardService.deleteFile(board);
         repository.deleteById(id);
     }
 

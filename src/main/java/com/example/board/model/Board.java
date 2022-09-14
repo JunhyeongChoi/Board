@@ -42,8 +42,5 @@ public class Board {
     @OneToMany(mappedBy = "board")
     private List<Comment> commentList;
 
-    @ManyToOne
-    private SiteUser author;
-
 }
 
