@@ -59,6 +59,12 @@ public class BoardService {
         board.setFilepath(null);
     }
 
+    public String getFilePath(Board board) {
+        String filePath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files\\" + board.getFilename();
+
+        return filePath;
+    }
+
     public Board getBoard(Long id) {
         Optional<Board> board = this.boardRepository.findById(id);
         if (board.isPresent()) {

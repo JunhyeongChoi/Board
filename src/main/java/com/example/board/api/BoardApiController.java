@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.io.File;
 import java.time.LocalDateTime;
 
 @RestController
@@ -67,11 +68,16 @@ class BoardApiController {
     @PutMapping("/boards/{id}")
     ResponseEntity<Board> replaceBoard(@Valid Board newBoard, @PathVariable Long id, MultipartFile file) {
 
-        Board exBoard = repository.findById(newBoard.getId()).orElse(null);
-
+        Board exBoard = repository.findById(id).orElse(null);
         if (exBoard == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if (newBoard.getPassword().equals(exBoard.getPassword())) {
+        // 새로운 파일경로
+        String filePath = boardService.getFilePath(newBoard);
+
+        // 삭제할 파일경로
+        String deleteFilePath = boardService.getFilePath(exBoard);
+
+        if (newBoard.getPassword().equals(newBoard.getPassword())) {
 
             return repository.findById(id)
                     .map(board -> {
@@ -91,6 +97,12 @@ class BoardApiController {
                             return ResponseEntity.status(HttpStatus.OK).body(board);
                         } else {
                             try {
+                                // 파일을 수정할 경우 기존 파일 제거
+                                if (!filePath.equals(deleteFilePath)) {
+                                    File deleteFile = new File(deleteFilePath);
+                                    deleteFile.delete();
+                                }
+
                                 boardService.write(board, file);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
