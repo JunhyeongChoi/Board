@@ -1,7 +1,6 @@
 package com.example.board.service;
 
 import com.example.board.DataNotFoundException;
-import com.example.board.form.AnswerForm;
 import com.example.board.model.Answer;
 import com.example.board.model.Board;
 import com.example.board.repository.AnswerRepository;
@@ -17,10 +16,12 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
 
-    public Answer create(Board board, AnswerForm answerForm) {
+    public Answer create(Board board, Answer answerForm) {
         Answer answer = new Answer();
         answer.setContent(answerForm.getContent());
         answer.setDate(LocalDateTime.now());
+        answer.setNickname(answerForm.getNickname());
+        answer.setPassword(answerForm.getPassword());
         answer.setBoard(board);
 
         answerRepository.save(answer);

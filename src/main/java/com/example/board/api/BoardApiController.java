@@ -8,9 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 @RestController
@@ -33,7 +37,11 @@ class BoardApiController {
 
     // 글 작성 API
     @PostMapping("/boards")
-    Board newBoard(Board newBoard, MultipartFile file) throws Exception {
+    Board newBoard(@Valid Board newBoard, MultipartFile file) throws Exception {
+
+        if (newBoard.getNickname() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "닉네임 입력 필수");
+        }
 
         LocalDateTime now = LocalDateTime.now();
         newBoard.setDate(now);
@@ -49,39 +57,57 @@ class BoardApiController {
 
     // id로 글 조회 API
     @GetMapping("/boards/{id}")
-    Board one(@PathVariable Long id) {
-
-        return repository.findById(id).orElse(null);
+    ResponseEntity<Board> one(@PathVariable Long id) {
+        Board board = repository.findById(id).orElse(null);
+        if (board == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(board, HttpStatus.OK);
     }
 
     // 글 수정 API
     @PutMapping("/boards/{id}")
-    Board replaceBoard(Board newBoard, @PathVariable Long id, MultipartFile file) {
+    ResponseEntity<Board> replaceBoard(@Valid Board newBoard, @PathVariable Long id, MultipartFile file) {
 
-        return repository.findById(id)
-                .map(board -> {
-                    board.setTitle(newBoard.getTitle());
-                    board.setContent(newBoard.getContent());
-                    board.setIsLost(newBoard.getIsLost());
+        Board exBoard = repository.findById(newBoard.getId()).orElse(null);
 
-                    if (file == null) {
-                        boardService.deleteFile(board);
-                        return repository.save(board);
-                    } else {
-                        try {
-                            boardService.write(board, file);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
+        if (exBoard == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if (newBoard.getPassword().equals(exBoard.getPassword())) {
+
+            return repository.findById(id)
+                    .map(board -> {
+                        board.setTitle(newBoard.getTitle());
+                        board.setContent(newBoard.getContent());
+                        board.setIsLost(newBoard.getIsLost());
+
+                        if (file == null) {
+                            boardService.deleteFile(board);
+                            repository.save(board);
+                            return ResponseEntity.status(HttpStatus.OK).body(board);
                         }
-                    }
 
-                    Board resultBoard = repository.findById(board.getId()).orElse(null);
-                    return resultBoard;
-                })
-                .orElseGet(() -> {
-                    newBoard.setId(id);
-                    return repository.save(newBoard);
-                });
+                        if (file.isEmpty()) {
+                            boardService.deleteFile(board);
+                            repository.save(board);
+                            return ResponseEntity.status(HttpStatus.OK).body(board);
+                        } else {
+                            try {
+                                boardService.write(board, file);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
+                        Board resultBoard = repository.findById(board.getId()).orElse(null);
+                        return ResponseEntity.status(HttpStatus.OK).body(resultBoard);
+                    })
+                    .orElseGet(() -> {
+                        newBoard.setId(id);
+                        repository.save(newBoard);
+                        return ResponseEntity.status(HttpStatus.OK).body(newBoard);
+                    });
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호 불일치");
+        }
     }
 
 //    // 파일 삭제 API
@@ -96,12 +122,24 @@ class BoardApiController {
 
     // 글 삭제 API
     @DeleteMapping("/boards/{id}")
-    void deleteBoard(@PathVariable Long id) {
+    ResponseEntity deleteBoard(@PathVariable Long id, String password) {
 
         Board board = repository.findById(id).orElse(null);
 
-        boardService.deleteFile(board);
-        repository.deleteById(id);
+        if (board == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if (password == null || password.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호 입력 필수");
+        }
+
+        if (password.equals(board.getPassword())) {
+            boardService.deleteFile(board);
+            repository.deleteById(id);
+
+            return ResponseEntity.ok("정상적으로 삭제되었습니다");
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호 불일치");
+        }
     }
 
 }

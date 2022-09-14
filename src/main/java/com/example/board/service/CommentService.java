@@ -16,12 +16,14 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public Comment create(Answer answer, String content) {
+    public Comment create(Answer answer, Comment comment) {
         Comment c = new Comment();
-        c.setContent(content);
+        c.setContent(comment.getContent());
         c.setCreateDate(LocalDateTime.now());
         c.setBoard(answer.getBoard());
         c.setAnswer(answer);
+        c.setNickname(comment.getNickname());
+        c.setPassword(comment.getPassword());
         c = this.commentRepository.save(c);
         return c;
     }
