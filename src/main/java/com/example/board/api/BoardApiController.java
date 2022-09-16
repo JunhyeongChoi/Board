@@ -77,7 +77,7 @@ class BoardApiController {
         // 삭제할 파일경로
         String deleteFilePath = boardService.getFilePath(exBoard);
 
-        if (newBoard.getPassword().equals(newBoard.getPassword())) {
+        if (newBoard.getPassword().equals(exBoard.getPassword())) {
 
             return repository.findById(id)
                     .map(board -> {

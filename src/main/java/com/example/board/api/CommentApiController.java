@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("/api")
 @RestController
@@ -65,7 +64,10 @@ public class CommentApiController {
     @PutMapping("/comments/{id}")
     public ResponseEntity<Comment> answerModify(@Valid @RequestBody Comment newComment, @PathVariable("id") Long id) {
 
-        if (newComment.getPassword().equals(newComment.getPassword())) {
+        Comment exComment = commentRepository.findById(id).orElse(null);
+        if (exComment == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if (newComment.getPassword().equals(exComment.getPassword())) {
 
         return commentRepository.findById(id)
                 .map(comment -> {

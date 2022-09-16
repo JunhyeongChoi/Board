@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,6 +36,7 @@ public class Comment {
 
     @NotNull(message = "비밀번호는 필수 항목입니다.")
     @Size(min=4, max=50, message = "비밀번호는 네 자리 이상이어야 합니다.")
+    @JsonIgnore
     private String password;
 
     @ManyToOne

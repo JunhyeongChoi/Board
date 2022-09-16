@@ -41,6 +41,7 @@ public class Board {
 
     @NotNull(message = "비밀번호는 필수 항목입니다.")
     @Size(min=4, max=50, message = "비밀번호는 네 자리 이상이어야 합니다.")
+    @JsonIgnore
     private String password;
 
     @JsonIgnore

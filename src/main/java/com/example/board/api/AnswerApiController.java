@@ -61,7 +61,10 @@ public class AnswerApiController {
     @PutMapping("/answers/{id}")
     public ResponseEntity<Answer> answerModify(@Valid @RequestBody Answer newAnswer, @PathVariable("id") Long id) {
 
-        if (newAnswer.getPassword().equals(newAnswer.getPassword())) {
+        Answer exAnswer = answerRepository.findById(id).orElse(null);
+        if (exAnswer == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if (newAnswer.getPassword().equals(exAnswer.getPassword())) {
 
         return answerRepository.findById(id)
                 .map(answer -> {
