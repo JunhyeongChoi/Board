@@ -1,15 +1,15 @@
-package com.example.question.dto;
+package com.example.lost.lostDto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class SuccessDto {
+public class LostSuccessDto {
 
     private Boolean success;
 
-    public SuccessDto(Boolean success) {
+    public LostSuccessDto(Boolean success) {
         this.success = success;
     }
 

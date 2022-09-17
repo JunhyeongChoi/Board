@@ -1,16 +1,17 @@
-package com.example.question.api;
+package com.example.lost.lostApi;
 
-import com.example.question.dto.SuccessDto;
-import com.example.question.entity.Question;
-import com.example.question.dto.AnswerDto;
-import com.example.question.dto.QuestionDto;
-import com.example.question.dto.CommentDto;
-import com.example.question.entity.Answer;
-import com.example.question.entity.Comment;
-import com.example.question.repository.QuestionRepository;
-import com.example.question.service.AnswerService;
-import com.example.question.service.QuestionService;
-import com.example.question.service.CommentService;
+import com.example.lost.lostDto.LostSuccessDto;
+import com.example.lost.lostEntity.LostPost;
+import com.example.lost.lostDto.LostAnswerDto;
+import com.example.lost.lostDto.LostPostDto;
+import com.example.lost.lostDto.LostCommentDto;
+import com.example.lost.lostEntity.LostAnswer;
+import com.example.lost.lostEntity.LostComment;
+import com.example.lost.lostForm.LostDeleteForm;
+import com.example.lost.lostRepository.LostPostRepository;
+import com.example.lost.lostService.LostAnswerService;
+import com.example.lost.lostService.LostPostService;
+import com.example.lost.lostService.LostCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,23 +32,23 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/lost")
-class QuestionApiController {
+class LostPostApiController {
 
     @Autowired
-    private QuestionRepository repository;
+    private LostPostRepository repository;
 
     @Autowired
-    private QuestionService questionService;
+    private LostPostService lostPostService;
 
     @Autowired
-    private AnswerService answerService;
+    private LostAnswerService lostAnswerService;
 
     @Autowired
-    private CommentService commentService;
+    private LostCommentService lostCommentService;
 
     // 페이징, 검색(제목, 내용에 포함) 조회 API
     @GetMapping("/posts")
-    public Page<Question> list(@PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+    public Page<LostPost> list(@PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
                                @RequestParam(required = false, defaultValue = "") String searchText) {
 
         return repository.findBySubjectContainingOrContentContaining(searchText, searchText, pageable);
@@ -62,32 +63,32 @@ class QuestionApiController {
                                                       @RequestParam(value = "page", defaultValue = "0") int page) {
 
         // 답변 페이징 처리
-        Page<Answer> pagingAnswer = answerService.getList(page, id);
-        Question question = this.questionService.getQuestion(id);
-        Page<Comment> commentPage = commentService.getQuestionCommentList(page, id);
+        Page<LostAnswer> pagingAnswer = lostAnswerService.getList(page, id);
+        LostPost lostPost = this.lostPostService.getQuestion(id);
+        Page<LostComment> commentPage = lostCommentService.getQuestionCommentList(page, id);
 
         if (pagingAnswer.getNumberOfElements() == 0 && page != 0) {
             throw new IllegalArgumentException("잘못된 입력 값입니다.");
         }
 
-        QuestionDto questionDto = new QuestionDto(question.getId(), question.getSubject(), question.getContent(),
-                question.getCreateDate(), question.getUsername(), question.getIsLost());
+        LostPostDto lostPostDto = new LostPostDto(lostPost.getId(), lostPost.getSubject(), lostPost.getContent(),
+                lostPost.getCreateDate(), lostPost.getUsername(), lostPost.getIsLost());
         
-        Page<AnswerDto> answerPagingDto = pagingAnswer.map(
-                post -> new AnswerDto(
+        Page<LostAnswerDto> answerPagingDto = pagingAnswer.map(
+                post -> new LostAnswerDto(
                         post.getId(),post.getContent(),post.getCreateDate(),
                         post.getUsername(),
-                        post.getCommentList()
+                        post.getLostCommentList()
                 ));
-        Page<CommentDto> commentDtoPage = commentPage.map(
-                post -> new CommentDto (
+        Page<LostCommentDto> commentDtoPage = commentPage.map(
+                post -> new LostCommentDto(
                         post.getId(),post.getContent(),post.getCreateDate(),
                         post.getUsername()
                 ));
 
         Map<String, Object> result = new HashMap<>();
-        result.put("postComments", commentDtoPage);
-        result.put("posts", questionDto);
+        result.put("questionComments", commentDtoPage);
+        result.put("questions", lostPostDto);
         result.put("answers", answerPagingDto);
 
         return ResponseEntity.ok(result);
@@ -95,61 +96,61 @@ class QuestionApiController {
 
     // 글 작성 API
     @PostMapping("/posts")
-    Question newQuestion(@Valid Question newQuestion, MultipartFile file, BindingResult bindingResult) throws Exception {
+    LostPost newQuestion(@Valid LostPost newLostPost, MultipartFile file, BindingResult bindingResult) throws Exception {
 
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException("잘못된 입력 값입니다.");
         }
 
-        if (newQuestion.getUsername() == null) {
+        if (newLostPost.getUsername() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "닉네임 입력 필수");
         }
 
         LocalDateTime now = LocalDateTime.now();
-        newQuestion.setCreateDate(now);
+        newLostPost.setCreateDate(now);
 
         if (file == null) {
-            repository.save(newQuestion);
+            repository.save(newLostPost);
         } else {
-            questionService.write(newQuestion, file);
+            lostPostService.write(newLostPost, file);
         }
 
-        return repository.findById(newQuestion.getId()).orElse(null);
+        return repository.findById(newLostPost.getId()).orElse(null);
     }
 
     // 글 수정 API
     @PutMapping("/posts/{id}")
-    ResponseEntity<Question> replaceQuestion(@Valid Question newQuestion, @PathVariable Long id, MultipartFile file, BindingResult bindingResult) {
+    ResponseEntity<LostPost> replaceQuestion(@Valid LostPost newLostPost, @PathVariable Long id, MultipartFile file, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException("잘못된 입력 값입니다.");
         }
 
-        Question exQuestion = repository.findById(id).orElse(null);
-        if (exQuestion == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        LostPost exLostPost = repository.findById(id).orElse(null);
+        if (exLostPost == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         // 새로운 파일경로
-        String filePath = questionService.getFilePath(newQuestion);
+        String filePath = lostPostService.getFilePath(newLostPost);
 
         // 삭제할 파일경로
-        String deleteFilePath = questionService.getFilePath(exQuestion);
+        String deleteFilePath = lostPostService.getFilePath(exLostPost);
 
-        if (newQuestion.getPassword().equals(exQuestion.getPassword())) {
+        if (newLostPost.getPassword().equals(exLostPost.getPassword())) {
 
             return repository.findById(id)
                     .map(question -> {
-                        question.setSubject(newQuestion.getSubject());
-                        question.setContent(newQuestion.getContent());
-                        question.setIsLost(newQuestion.getIsLost());
+                        question.setSubject(newLostPost.getSubject());
+                        question.setContent(newLostPost.getContent());
+                        question.setIsLost(newLostPost.getIsLost());
 
                         if (file == null) {
-                            questionService.deleteFile(question);
+                            lostPostService.deleteFile(question);
                             repository.save(question);
                             return ResponseEntity.status(HttpStatus.OK).body(question);
                         }
 
                         if (file.isEmpty()) {
-                            questionService.deleteFile(question);
+                            lostPostService.deleteFile(question);
                             repository.save(question);
                             return ResponseEntity.status(HttpStatus.OK).body(question);
                         } else {
@@ -160,19 +161,19 @@ class QuestionApiController {
                                     deleteFile.delete();
                                 }
 
-                                questionService.write(question, file);
+                                lostPostService.write(question, file);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                         }
 
-                        Question resultQuestion = repository.findById(question.getId()).orElse(null);
-                        return ResponseEntity.status(HttpStatus.OK).body(resultQuestion);
+                        LostPost resultLostPost = repository.findById(question.getId()).orElse(null);
+                        return ResponseEntity.status(HttpStatus.OK).body(resultLostPost);
                     })
                     .orElseGet(() -> {
-                        newQuestion.setId(id);
-                        repository.save(newQuestion);
-                        return ResponseEntity.status(HttpStatus.OK).body(newQuestion);
+                        newLostPost.setId(id);
+                        repository.save(newLostPost);
+                        return ResponseEntity.status(HttpStatus.OK).body(newLostPost);
                     });
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다");
@@ -191,20 +192,20 @@ class QuestionApiController {
 
     // 글 삭제 API
     @DeleteMapping("/posts/{id}")
-    ResponseEntity deleteQuestion(@PathVariable Long id, String password) {
+    ResponseEntity deleteQuestion(@PathVariable Long id, @Valid @RequestBody LostDeleteForm lostDeleteForm) {
 
-        Question question = repository.findById(id).orElse(null);
+        LostPost lostPost = repository.findById(id).orElse(null);
 
-        if (question == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (lostPost == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if (password == null || password.isEmpty()) {
+        if (lostDeleteForm.getPassword() == null || lostDeleteForm.getPassword().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호 입력 필수");
         }
 
-        if (password.equals(question.getPassword())) {
-            SuccessDto successDto = new SuccessDto(this.questionService.delete(question));
-            questionService.deleteFile(question);
-            return ResponseEntity.ok(successDto);
+        if (lostDeleteForm.getPassword().equals(lostPost.getPassword())) {
+            LostSuccessDto lostSuccessDto = new LostSuccessDto(this.lostPostService.delete(lostPost));
+            lostPostService.deleteFile(lostPost);
+            return ResponseEntity.ok(lostSuccessDto);
 
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");

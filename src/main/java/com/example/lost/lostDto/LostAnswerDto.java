@@ -1,15 +1,17 @@
-package com.example.question.dto;
+package com.example.lost.lostDto;
 
+import com.example.lost.lostEntity.LostComment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentDto {
+public class LostAnswerDto {
 
     private Long id;
 
@@ -19,11 +21,15 @@ public class CommentDto {
 
     private String nickname;
 
+    private List<LostComment> lostCommentList;
 
-    public CommentDto(Long id, String content, LocalDateTime createDate, String nickname) {
+
+    public LostAnswerDto(Long id, String content, LocalDateTime createDate,
+                         String nickname, List<LostComment> lostCommentList) {
         this.id = id;
         this.content = content;
         this.createDate = createDate;
         this.nickname = nickname;
+        this.lostCommentList = lostCommentList;
     }
 }

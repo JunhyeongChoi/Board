@@ -1,10 +1,10 @@
-package com.example.question;
+package com.example.lost;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class QuestionApplicationTests {
+class LostPostApplicationTests {
 
 	@Test
 	void contextLoads() {

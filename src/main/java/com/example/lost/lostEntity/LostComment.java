@@ -1,9 +1,13 @@
-package com.example.question.entity;
+package com.example.lost.lostEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -11,10 +15,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@Entity
-public class Answer {
+public class LostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,12 +38,12 @@ public class Answer {
     @Size(min=4, max=50, message = "비밀번호는 네 자리 이상이어야 합니다.")
     private String password;
 
-    @ManyToOne
     @JsonIgnore
-    private Question question;
+    @ManyToOne
+    private LostPost question;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
-    private List<Comment> commentList;
+    @ManyToOne
+    private LostAnswer answer;
 
 }

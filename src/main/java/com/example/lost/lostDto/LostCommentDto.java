@@ -1,4 +1,4 @@
-package com.example.question.dto;
+package com.example.lost.lostDto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +9,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class QuestionDto {
+public class LostCommentDto {
 
     private Long id;
-
-    private String title;
 
     private String content;
 
@@ -21,17 +19,11 @@ public class QuestionDto {
 
     private String nickname;
 
-    private Boolean isLost;
 
-    public QuestionDto(Long id, String title, String content, LocalDateTime createDate,
-                       String nickname, Boolean isLost) {
+    public LostCommentDto(Long id, String content, LocalDateTime createDate, String nickname) {
         this.id = id;
-        this.title = title;
         this.content = content;
         this.createDate = createDate;
         this.nickname = nickname;
-        this.isLost = isLost;
     }
-
-
 }

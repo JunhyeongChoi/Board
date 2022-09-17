@@ -1,8 +1,8 @@
-package com.example.question.service;
+package com.example.lost.lostService;
 
-import com.example.question.DataNotFoundException;
-import com.example.question.entity.Question;
-import com.example.question.repository.QuestionRepository;
+import com.example.lost.DataNotFoundException;
+import com.example.lost.lostEntity.LostPost;
+import com.example.lost.lostRepository.LostPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,13 +12,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class QuestionService {
+public class LostPostService {
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private LostPostRepository lostPostRepository;
 
     // 글 등록
-    public void write(Question question, MultipartFile file) throws Exception {
+    public void write(LostPost lostPost, MultipartFile file) throws Exception {
 
         if (!file.getOriginalFilename().isEmpty()) {
 
@@ -32,26 +32,26 @@ public class QuestionService {
 
             file.transferTo(saveFile);
 
-            question.setFilename(fileName);
-            question.setFilepath("/files/" + fileName);
+            lostPost.setFilename(fileName);
+            lostPost.setFilepath("/files/" + fileName);
 
         }
 
-        questionRepository.save(question);
+        lostPostRepository.save(lostPost);
 
     }
 
-    public Boolean delete(Question question) {
+    public Boolean delete(LostPost lostPost) {
 
-        this.questionRepository.delete(question);
+        this.lostPostRepository.delete(lostPost);
         return true;
     }
 
     // 파일 삭제
-    public void deleteFile(Question question) {
+    public void deleteFile(LostPost lostPost) {
 
         // 파일의 경로 + 파일명
-        String filePath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files\\" + question.getFilename();
+        String filePath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files\\" + lostPost.getFilename();
         File deleteFile = new File(filePath);
 
         // 파일이 존재하는지 체크 존재할경우 true, 존재하지않을경우 false
@@ -61,18 +61,18 @@ public class QuestionService {
             deleteFile.delete();
         }
 
-        question.setFilename(null);
-        question.setFilepath(null);
+        lostPost.setFilename(null);
+        lostPost.setFilepath(null);
     }
 
-    public String getFilePath(Question question) {
-        String filePath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files\\" + question.getFilename();
+    public String getFilePath(LostPost lostPost) {
+        String filePath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files\\" + lostPost.getFilename();
 
         return filePath;
     }
 
-    public Question getQuestion(Long id) {
-        Optional<Question> question = this.questionRepository.findById(id);
+    public LostPost getQuestion(Long id) {
+        Optional<LostPost> question = this.lostPostRepository.findById(id);
         if (question.isPresent()) {
             return question.get();
         } else {
