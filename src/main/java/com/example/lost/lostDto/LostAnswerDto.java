@@ -17,19 +17,19 @@ public class LostAnswerDto {
 
     private String content;
 
-    private LocalDateTime createDate;
+    private String createDate;
 
-    private String nickname;
+    private String username;
 
     private List<LostComment> lostCommentList;
 
 
-    public LostAnswerDto(Long id, String content, LocalDateTime createDate,
-                         String nickname, List<LostComment> lostCommentList) {
+    public LostAnswerDto(Long id, String content, String createDate,
+                         String username, List<LostComment> lostCommentList) {
         this.id = id;
         this.content = content;
         this.createDate = createDate;
-        this.nickname = nickname;
+        this.username = username;
         this.lostCommentList = lostCommentList;
     }
 }

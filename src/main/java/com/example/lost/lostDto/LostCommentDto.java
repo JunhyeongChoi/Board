@@ -15,15 +15,14 @@ public class LostCommentDto {
 
     private String content;
 
-    private LocalDateTime createDate;
+    private String createDate;
 
-    private String nickname;
+    private String username;
 
-
-    public LostCommentDto(Long id, String content, LocalDateTime createDate, String nickname) {
+    public LostCommentDto(Long id, String content, String createDate, String username) {
         this.id = id;
         this.content = content;
         this.createDate = createDate;
-        this.nickname = nickname;
+        this.username = username;
     }
 }

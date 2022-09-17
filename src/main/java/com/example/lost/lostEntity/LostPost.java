@@ -25,7 +25,7 @@ public class LostPost {
     private String content;
 
     @Column
-    private LocalDateTime createDate;
+    private String createDate;
 
     private Boolean isLost;   // 분실, 발견
 
@@ -42,11 +42,11 @@ public class LostPost {
     private String password;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "lostPost", cascade = CascadeType.REMOVE)
     private List<LostAnswer> lostAnswerList;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "lostPost")
     private List<LostComment> lostCommentList;
 
 }

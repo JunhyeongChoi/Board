@@ -17,13 +17,13 @@ public class LostPostDto {
 
     private String content;
 
-    private LocalDateTime createDate;
+    private String createDate;
 
     private String nickname;
 
     private Boolean isLost;
 
-    public LostPostDto(Long id, String title, String content, LocalDateTime createDate,
+    public LostPostDto(Long id, String title, String content, String createDate,
                        String nickname, Boolean isLost) {
         this.id = id;
         this.title = title;

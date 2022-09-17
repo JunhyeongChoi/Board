@@ -29,7 +29,7 @@ public class LostComment {
     @Size(min=1, message = "내용은 최소 한 글자 이상이어야 합니다.")
     private String content;
 
-    private LocalDateTime createDate;
+    private String createDate;
 
     @Size(min=1, message = "닉네임은 한 글자 이상이어야 합니다.")
     private String username;
@@ -40,10 +40,10 @@ public class LostComment {
 
     @JsonIgnore
     @ManyToOne
-    private LostPost question;
+    private LostPost lostPost;
 
     @JsonIgnore
     @ManyToOne
-    private LostAnswer answer;
+    private LostAnswer lostAnswer;
 
 }

@@ -24,9 +24,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +67,7 @@ class LostPostApiController {
         // 답변 페이징 처리
         Page<LostAnswer> pagingAnswer = lostAnswerService.getList(page, id);
         LostPost lostPost = this.lostPostService.getQuestion(id);
-        Page<LostComment> commentPage = lostCommentService.getQuestionCommentList(page, id);
+        Page<LostComment> commentPage = lostCommentService.getLostPostCommentList(page, id);
 
         if (pagingAnswer.getNumberOfElements() == 0 && page != 0) {
             throw new IllegalArgumentException("잘못된 입력 값입니다.");
@@ -95,7 +97,7 @@ class LostPostApiController {
 
     // 글 작성 API
     @PostMapping("/posts")
-    LostPost newQuestion(@Valid LostPost newLostPost, MultipartFile file, BindingResult bindingResult) throws Exception {
+    LostPost newQuestion(@Valid LostPost newLostPost, MultipartFile file, BindingResult bindingResult, HttpServletRequest request) throws Exception {
 
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException("잘못된 입력 값입니다.");
@@ -105,13 +107,13 @@ class LostPostApiController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "닉네임 입력 필수");
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         newLostPost.setCreateDate(now);
 
         if (file == null) {
             repository.save(newLostPost);
         } else {
-            lostPostService.write(newLostPost, file);
+            lostPostService.write(newLostPost, file, request);
         }
 
         return repository.findById(newLostPost.getId()).orElse(null);
@@ -119,7 +121,7 @@ class LostPostApiController {
 
     // 글 수정 API
     @PutMapping("/posts/{id}")
-    ResponseEntity<LostPost> replaceQuestion(@Valid LostPost newLostPost, @PathVariable Long id, MultipartFile file, BindingResult bindingResult) {
+    ResponseEntity<LostPost> replaceQuestion(@Valid LostPost newLostPost, @PathVariable Long id, MultipartFile file, BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException("잘못된 입력 값입니다.");
@@ -160,7 +162,7 @@ class LostPostApiController {
                                     deleteFile.delete();
                                 }
 
-                                lostPostService.write(question, file);
+                                lostPostService.write(question, file, request);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }

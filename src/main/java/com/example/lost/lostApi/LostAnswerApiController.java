@@ -3,8 +3,10 @@ package com.example.lost.lostApi;
 import com.example.lost.lostDto.LostSuccessDto;
 import com.example.lost.lostEntity.LostAnswer;
 import com.example.lost.lostEntity.LostPost;
+import com.example.lost.lostForm.CreateForm;
+import com.example.lost.lostForm.ModifyForm;
 import com.example.lost.lostForm.LostDeleteForm;
-import com.example.lost.lostRepository.LostAnswerRepository;
+import com.example.lost.lostRepository.AnswerRepository;
 import com.example.lost.lostService.LostAnswerService;
 import com.example.lost.lostService.LostPostService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +23,9 @@ import javax.validation.Valid;
 public class LostAnswerApiController {
 
     private final LostPostService lostPostService;
-    private final LostAnswerRepository lostAnswerRepository;
+    private final AnswerRepository answerRepository;
     private final LostAnswerService lostAnswerService;
-//
+
 //    // 전체 댓글 조회 API
 //    @GetMapping("/answers")
 //    public List<Answer> all() {
@@ -42,7 +44,7 @@ public class LostAnswerApiController {
 
     // 댓글 등록 API
     @PostMapping("/answers/{id}")
-    public ResponseEntity<LostAnswer> answerCreate(@PathVariable Long id, @Valid @RequestBody LostAnswer lostAnswerForm){
+    public ResponseEntity<CreateForm> answerCreate(@PathVariable Long id, @Valid @RequestBody LostAnswer lostAnswerForm){
 
         if (lostAnswerForm.getUsername() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "닉네임 입력 필수");
@@ -54,28 +56,32 @@ public class LostAnswerApiController {
         LostAnswer lostAnswer = this.lostAnswerService.create(lostPost, lostAnswerForm);
         if (lostAnswer == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return (lostAnswer != null) ? ResponseEntity.status(HttpStatus.OK).body(lostAnswer) : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        CreateForm createForm = new CreateForm(lostAnswerForm.getContent(), lostAnswerForm.getUsername(), lostAnswer.getCreateDate());
+
+        return (lostAnswer != null) ? ResponseEntity.status(HttpStatus.OK).body(createForm) : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     // 댓글 수정 api
     @PutMapping("/answers/{id}")
-    public ResponseEntity<LostAnswer> answerModify(@Valid @RequestBody LostAnswer newLostAnswer, @PathVariable("id") Long id) {
+    public ResponseEntity<ModifyForm> answerModify(@Valid @RequestBody LostAnswer newLostAnswer, @PathVariable("id") Long id) {
 
-        LostAnswer exLostAnswer = lostAnswerRepository.findById(id).orElse(null);
+        LostAnswer exLostAnswer = answerRepository.findById(id).orElse(null);
         if (exLostAnswer == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (newLostAnswer.getPassword().equals(exLostAnswer.getPassword())) {
 
-        return lostAnswerRepository.findById(id)
+        return answerRepository.findById(id)
                 .map(answer -> {
                     answer.setContent(newLostAnswer.getContent());
-                    lostAnswerRepository.save(answer);
-                    return ResponseEntity.status(HttpStatus.OK).body(answer);
+                    answerRepository.save(answer);
+                    ModifyForm modifyForm = new ModifyForm(newLostAnswer.getContent(), exLostAnswer.getCreateDate());
+                    return ResponseEntity.status(HttpStatus.OK).body(modifyForm);
                 })
                 .orElseGet(() -> {
                     newLostAnswer.setId(id);
-                    lostAnswerRepository.save(newLostAnswer);
-                    return ResponseEntity.status(HttpStatus.OK).body(newLostAnswer);
+                    answerRepository.save(newLostAnswer);
+                    ModifyForm modifyForm = new ModifyForm(newLostAnswer.getContent(), exLostAnswer.getCreateDate());
+                    return ResponseEntity.status(HttpStatus.OK).body(modifyForm);
                 });
 
         } else {

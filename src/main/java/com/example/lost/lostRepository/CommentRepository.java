@@ -7,9 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface LostCommentRepository extends JpaRepository<LostComment, Long> {
+public interface CommentRepository extends JpaRepository<LostComment, Long> {
 
-    Page<LostComment> findAllByQuestion(LostPost lostPost, Pageable pageable);
+    Page<LostComment> findAllByLostPost(LostPost lostPost, Pageable pageable);
 
-    Page<LostComment> findAllByAnswer(LostAnswer question, Pageable pageable);
+    Page<LostComment> findAllByLostAnswer(LostAnswer question, Pageable pageable);
 }

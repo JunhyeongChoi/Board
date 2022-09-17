@@ -3,8 +3,10 @@ package com.example.lost.lostApi;
 import com.example.lost.lostDto.LostSuccessDto;
 import com.example.lost.lostEntity.LostAnswer;
 import com.example.lost.lostEntity.LostComment;
+import com.example.lost.lostForm.CreateForm;
 import com.example.lost.lostForm.LostDeleteForm;
-import com.example.lost.lostRepository.LostCommentRepository;
+import com.example.lost.lostForm.ModifyForm;
+import com.example.lost.lostRepository.CommentRepository;
 import com.example.lost.lostService.LostAnswerService;
 import com.example.lost.lostService.LostCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class LostCommentApiController {
     private LostCommentService lostCommentService;
 
     @Autowired
-    private LostCommentRepository lostCommentRepository;
+    private CommentRepository commentRepository;
 
     @Autowired
     private LostAnswerService lostAnswerService;
@@ -46,7 +48,7 @@ public class LostCommentApiController {
 
     // 대댓글 등록 API
     @PostMapping(value = "/comments/{id}")
-    public ResponseEntity<LostComment> createQuestionComment(@PathVariable("id") Long id, @Valid @RequestBody LostComment lostCommentForm) {
+    public ResponseEntity<CreateForm> createLostPostComment(@PathVariable("id") Long id, @Valid @RequestBody LostComment lostCommentForm) {
 
         if (lostCommentForm.getUsername() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "닉네임 입력 필수");
@@ -58,28 +60,32 @@ public class LostCommentApiController {
         LostComment lostComment = lostCommentService.create(lostAnswer, lostCommentForm);
         if (lostComment == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return (lostComment != null) ? ResponseEntity.status(HttpStatus.OK).body(lostComment) : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        CreateForm createForm = new CreateForm(lostCommentForm.getContent(), lostCommentForm.getUsername(), lostComment.getCreateDate());
+
+        return (lostComment != null) ? ResponseEntity.status(HttpStatus.OK).body(createForm) : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     // 대댓글 수정 api
     @PutMapping("/comments/{id}")
-    public ResponseEntity<LostComment> answerModify(@Valid @RequestBody LostComment newLostComment, @PathVariable("id") Long id) {
+    public ResponseEntity<ModifyForm> answerModify(@Valid @RequestBody LostComment newLostComment, @PathVariable("id") Long id) {
 
-        LostComment exLostComment = lostCommentRepository.findById(id).orElse(null);
+        LostComment exLostComment = commentRepository.findById(id).orElse(null);
         if (exLostComment == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (newLostComment.getPassword().equals(exLostComment.getPassword())) {
 
-        return lostCommentRepository.findById(id)
+        return commentRepository.findById(id)
                 .map(comment -> {
                     comment.setContent(newLostComment.getContent());
-                    lostCommentRepository.save(comment);
-                    return ResponseEntity.status(HttpStatus.OK).body(comment);
+                    commentRepository.save(comment);
+                    ModifyForm modifyForm = new ModifyForm(newLostComment.getContent(), exLostComment.getCreateDate());
+                    return ResponseEntity.status(HttpStatus.OK).body(modifyForm);
                 })
                 .orElseGet(() -> {
                     newLostComment.setId(id);
-                    lostCommentRepository.save(newLostComment);
-                    return ResponseEntity.status(HttpStatus.OK).body(newLostComment);
+                    commentRepository.save(newLostComment);
+                    ModifyForm modifyForm = new ModifyForm(newLostComment.getContent(), exLostComment.getCreateDate());
+                    return ResponseEntity.status(HttpStatus.OK).body(modifyForm);
                 });
 
         } else {

@@ -25,7 +25,7 @@ public class LostAnswer {
     @Size(min=1, message = "내용은 최소 한 글자 이상이어야 합니다.")
     private String content;
 
-    private LocalDateTime createDate;
+    private String createDate;
 
     @Size(min=1, message = "닉네임은 한 글자 이상이어야 합니다.")
     private String username;
@@ -36,10 +36,10 @@ public class LostAnswer {
 
     @ManyToOne
     @JsonIgnore
-    private LostPost question;
+    private LostPost lostPost;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "lostAnswer", cascade = CascadeType.REMOVE)
     private List<LostComment> lostCommentList;
 
 }

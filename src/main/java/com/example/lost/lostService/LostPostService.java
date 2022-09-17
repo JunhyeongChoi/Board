@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,11 +19,12 @@ public class LostPostService {
     private LostPostRepository lostPostRepository;
 
     // 글 등록
-    public void write(LostPost lostPost, MultipartFile file) throws Exception {
+    public void write(LostPost lostPost, MultipartFile file, HttpServletRequest request) throws Exception {
 
         if (!file.getOriginalFilename().isEmpty()) {
 
             String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
+            String filePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 
             UUID uuid = UUID.randomUUID();
 
@@ -33,7 +35,7 @@ public class LostPostService {
             file.transferTo(saveFile);
 
             lostPost.setFilename(fileName);
-            lostPost.setFilepath("/files/" + fileName);
+            lostPost.setFilepath(filePath + "/files/" + fileName);
 
         }
 
