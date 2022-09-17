@@ -87,7 +87,6 @@ class LostPostApiController {
                 ));
 
         Map<String, Object> result = new HashMap<>();
-        result.put("questionComments", commentDtoPage);
         result.put("questions", lostPostDto);
         result.put("answers", answerPagingDto);
 
