@@ -10,9 +10,12 @@
 ## 팀내 역할
 * 총 인원 (기획 1명, 디자인 1명, 프론트 2명, 백엔드 3명)
 * 백엔드 파트 담당 (분실물 게시판)
+<br>
 
 ## Flow Chart - 전체적인 흐름
 ![image](https://user-images.githubusercontent.com/103200144/222932702-39a6a3f5-0c70-4c54-aa7c-b63d519c4c61.png)
+
+<br>
 
 ## 완성된 홈페이지
 ![1](https://user-images.githubusercontent.com/103200144/222931849-ae6c0d32-d385-4bed-96fe-babef36a3a98.png)
