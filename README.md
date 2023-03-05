@@ -10,7 +10,6 @@
 ## 팀내 역할
 * 총 인원 (기획 1명, 디자인 1명, 프론트 2명, 백엔드 3명)
 * 백엔드 파트 담당 (분실물 게시판)
-<br>
 
 ## 사용 기술
 * Spring Boot
@@ -20,9 +19,6 @@
 * Spring Boot Devtools
 * Lombok
 * MariaDB
-
-## Flow Chart - 전체적인 흐름
-![image](https://user-images.githubusercontent.com/103200144/222932702-39a6a3f5-0c70-4c54-aa7c-b63d519c4c61.png)
 
 <br>
 
